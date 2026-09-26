@@ -1,0 +1,65 @@
+\documentclass[runningheads]{llncs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\begin{document}
+\title{A Clean Test Paper}
+\author{Jane Doe}
+\institute{Some University}
+\maketitle
+\begin{abstract}
+This abstract describes scenario-based testing of automated vehicles in a few words.
+\end{abstract}
+
+\section{Introduction}\label{sec:intro}
+Automated vehicles are complex systems that must be tested thoroughly before release.
+Scenario-based testing (SBT) is a common approach for this purpose.
+In this paper, we apply SBT to a new class of driving functions and report on three case studies.
+Figure~\ref{fig:arch} gives an overview of the architecture that we use throughout the paper.
+The evaluation in Sect.~\ref{sec:eval} shows that the approach scales to realistic traffic situations.
+We use SBT with several tools (e.g.,~\cite{smith2020,doe2021}) and compare the results with
+related approaches (cf.~\cite{lee2019}).
+The tool is available online.\footnote{\url{https://zenodo.org/records/1234567}, last accessed 2026-01-15.}
+
+The remainder of this paper is structured as follows: Sect.~\ref{sec:related} discusses related
+work, Sect.~\ref{sec:method} presents our method, Sect.~\ref{sec:eval} evaluates it, and
+Sect.~\ref{sec:conc} concludes the paper.
+
+\section{Related Work}\label{sec:related}
+Smith~\cite{smith2020} introduced a framework for testing automated vehicles that relies on
+a catalog of traffic situations. Doe~\cite{doe2021} extended this framework with a formal
+description language for scenarios. Both approaches focus on the functional behavior of the
+vehicle and do not consider the interaction between several driving functions, which is the
+gap that our work addresses in the following sections of this paper.
+
+\section{Method}\label{sec:method}
+Our method consists of three steps that are executed for every driving function under test.
+First, we derive relevant scenarios from the requirements of the function. Second, we execute
+these scenarios in a simulation environment and record the behavior of the vehicle. Third, we
+evaluate the recorded behavior against the requirements and report every violation that occurs.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{arch}
+\caption{Architecture of the test framework.}\label{fig:arch}
+\end{figure}
+
+\section{Evaluation}\label{sec:eval}
+We evaluate the method on three driving functions and report the results in Table~\ref{tab:res}.
+The method detected every violation that was known beforehand and found two new ones, which the
+developers of the driving functions confirmed after a manual inspection of the recorded runs.
+\begin{table}[t]
+\centering
+\caption{Results of the evaluation.}\label{tab:res}
+\begin{tabular}{lr}
+Function & Violations \\
+A & 3 \\
+\end{tabular}
+\end{table}
+
+\section{Conclusion}\label{sec:conc}
+We presented a method for SBT of interacting driving functions and showed in
+three case studies that it detects known and unknown violations. In future work, we plan to apply
+the method to further driving functions and to integrate it into a continuous integration setup.
+
+\bibliographystyle{splncs04}
+\bibliography{refs}
+\end{document}
