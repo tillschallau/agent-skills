@@ -1,0 +1,29 @@
+name: paper-finishing
+
+on:
+  push:
+    paths:
+      - "paper-finishing/**"
+      - ".github/workflows/paper-finishing.yml"
+  pull_request:
+    paths:
+      - "paper-finishing/**"
+      - ".github/workflows/paper-finishing.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: tests (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-2022]
+        python: ["3.8", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Run checker tests
+        run: python -m unittest discover -s paper-finishing/tests -v
