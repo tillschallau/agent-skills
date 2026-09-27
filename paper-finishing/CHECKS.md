@@ -29,7 +29,7 @@ No placeholder URLs (`\url{}`, example.com, `<link>`), empty or dummy citation k
 Every `\cite` and `\ref`-family command (`\ref`, `\eqref`, `\cref`, `\autoref`, ...) is preceded by `~` instead of a space: `as shown~\cite{x}`, `Fig.~\ref{f}`. Exceptions: at the start of a sentence, after an opening bracket, after a command, and for textual citations (`\citet`, `\citeauthor`).
 
 **L7 Citation mechanics** · fix · script
-Adjacent citations are merged (`\cite{a,b}` instead of `\cite{a}\cite{b}`). A citation comes before the sentence's final punctuation: `... shown~\cite{x}.`, not `... shown.\cite{x}`.
+Adjacent citations are merged (`\cite{a,b}` instead of `\cite{a}\cite{b}`), with the keys ordered by year (B6). A citation comes before the sentence's final punctuation: `... shown~\cite{x}.`, not `... shown.\cite{x}`.
 
 **L8 Quotes and dashes** · fix · script
 Quotes are written ``` ``text'' ```, never `"text"`. Unicode quotes and dashes are covered by L10. Number ranges and page ranges use `--` (`3--5`). A dash inside a sentence uses one style throughout: either `---` or a spaced `--`, never a spaced hyphen.
@@ -99,6 +99,9 @@ For every cited arXiv, CoRR or other preprint entry, search whether a peer-revie
 
 **B5 Title capitalization** · fix · script
 Title words whose capitals must survive the bibliography style are braced: acronyms and mixed case (`{LiDAR}`, `{CNN}s`), and proper nouns (`{Bayesian}`, `{Python}`). The script finds the first group; find proper nouns by reading the titles.
+
+**B6 Citation order by year** · fix · script
+The keys inside every citation command are ordered by publication year, earliest first: `\cite{smith2019,doe2021,lee2023}`. Keys from the same year keep their existing order. The year comes from `year`, `date`, or a `crossref` parent. If a cited entry has no year, its citation can't be ordered: report it together with B3.
 
 ## G: Language and style
 

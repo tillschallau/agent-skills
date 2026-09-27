@@ -122,6 +122,12 @@ class FlawedPaper(FixtureCase):
         self.assertFinding("B5", "'smith2020'", "LiDAR")
         self.assertFinding("B5", "'doe2021'", "CNNs")
 
+    def test_B6_citation_order(self):
+        self.assertFinding("B6", "doe2021 (2021), smith2020 (2020)", "\\cite{smith2020,doe2021}",
+                           where="method.tex:15")
+        self.assertNoFinding("B6", where="method.tex:16")  # same year keeps its order
+        self.assertFinding("B6", "'noyear' has no year", where="method.tex:17")
+
     def test_G2_variant(self):
         for word in ("behaviour", "modelled", "colour", "optimised"):
             self.assertFinding("G2", f"'{word}' is British")
@@ -219,6 +225,20 @@ class LibraryPaper(FixtureCase):
 
     def test_B1_points_to_shortened_bib(self):
         self.assertFinding("B1", "is not used", where="paper.bib")
+
+
+class EntryYearTest(unittest.TestCase):
+    def entries(self, **fields):
+        return {k: cp.BibEntry("misc", k, f, "refs.bib:1") for k, f in fields.items()}
+
+    def test_year_date_and_crossref(self):
+        by_key = self.entries(a={"year": "2019"}, b={"date": "2021-05-03"},
+                              c={"crossref": "p"}, p={"year": "{2018}"}, d={})
+        self.assertEqual(2019, cp.entry_year("a", by_key))
+        self.assertEqual(2021, cp.entry_year("b", by_key))
+        self.assertEqual(2018, cp.entry_year("c", by_key))
+        self.assertIsNone(cp.entry_year("d", by_key))
+        self.assertIsNone(cp.entry_year("missing", by_key))
 
 
 class FingerprintTest(unittest.TestCase):
