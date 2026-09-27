@@ -49,6 +49,7 @@ TITLES = {
     "B3": "Bib entry completeness",
     "B4": "Preprints",
     "B5": "Bib title capitalization",
+    "B6": "Citation order by year",
     "G2": "Spelling variant",
     "G3": "Hyphenation consistency",
     "G4": "Latin abbreviations",
@@ -976,6 +977,38 @@ def check_short_bib(doc: Doc, cited: dict, by_key: dict, bibs: list[Path], missi
                            f"{len(needed & keys)} of {len(needed)} needed")
 
 
+def entry_year(key: str, by_key: dict, depth: int = 0) -> int | None:
+    e = by_key.get(key)
+    if not e:
+        return None
+    if m := re.search(r"\d{4}", e.fields.get("year", "") or e.fields.get("date", "")):
+        return int(m.group(0))
+    parent = e.fields.get("crossref", "").strip()
+    return entry_year(parent, by_key, depth + 1) if parent and depth < 3 else None
+
+
+def check_cite_order(doc: Doc, by_key: dict, rep: Report) -> None:
+    """Keys inside one citation command are ordered by publication year, earliest first.
+    Keys with the same year keep their relative order."""
+    for m in CITE_RE.finditer(doc.nc):
+        if m.group(1) == "nocite" or not doc.in_body(m.start()):
+            continue
+        keys = [k.strip() for k in m.group(3).split(",") if k.strip()]
+        if len(keys) < 2 or any(k not in by_key for k in keys):
+            continue  # unknown keys are reported by B1
+        years = [entry_year(k, by_key) for k in keys]
+        if None in years:
+            nokey = keys[years.index(None)]
+            rep.add("B6", doc.where(m.start()), f"cannot order \\{m.group(1)}{{{','.join(keys)}}}: "
+                    f"'{nokey}' has no year")
+            continue
+        ordered = [k for _, k in sorted(zip(years, keys), key=lambda t: t[0])]
+        if ordered != keys:
+            shown = ", ".join(f"{k} ({y})" for k, y in zip(keys, years))
+            rep.add("B6", doc.where(m.start()), f"citations not ordered by year: {shown} -> "
+                    f"\\{m.group(1)}{{{','.join(ordered)}}}")
+
+
 def check_bib(doc: Doc, cited: dict, rep: Report, entries: list[BibEntry],
               bibs: list[Path]) -> None:
     by_key = {}
@@ -987,6 +1020,7 @@ def check_bib(doc: Doc, cited: dict, rep: Report, entries: list[BibEntry],
     for key in missing:
         rep.add("B1", doc.where(cited[key][0]), f"cited key '{key}' not found in any .bib file")
     check_short_bib(doc, cited, by_key, bibs, missing, rep)
+    check_cite_order(doc, by_key, rep)
     used = [by_key[k] for k in cited if k in by_key]
     groups: dict[str, list[BibEntry]] = defaultdict(list)
     for e in used:
